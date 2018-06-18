@@ -1,1 +1,22 @@
 <!DOCTYPE html>
+<script src="lib/d3.v3.min.js"></script>
+
+<script type="text/javascript">
+
+var dataset = []];
+
+d3.csv("match_data.csv", function(data) {
+    header = d3.keys(data[0]);
+    data.forEach(function(d) {
+        d["win_score"] = +d["win_score"];
+        d["loss_score"] = +d["loss_score"];
+    });
+    dataset = data;
+    console.log(dataset);
+    
+    go();
+});
+
+function go() {
+    console.log(dataset[0]);
+}
