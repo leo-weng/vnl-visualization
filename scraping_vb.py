@@ -12,14 +12,23 @@ page = urllib2.urlopen(round_1_page)
 # parse the html using beautifulsoup
 soup = BeautifulSoup(page, 'html.parser')
 
-# countries = []
-# for i in range(0, 16):
-#     id = 'wcbody_0_wcgridpad781180e1c6f34a88b89e0ca072c046b8_1_wcmenucontent_0_PoolsBox_Pools_PoolsBox_0_ctl00_0_Ranks_0_Link2_' + str(i)
-#     country_tag = soup.find('a', attrs={'id':id})
-#     rank_tag =  country_tag.parent.parent.parent.previous_sibling.previous_sibling
-#     games_tag = rank_tag.next_sibling.next_sibling.next_sibling.next_sibling
-#     wins_tag = games_tag.next_sibling.next_sibling
-#     losses_tag = wins_tag.next_sibling.next_sibling
+teams = []
+for i in range(0, 16):
+    id = 'wcbody_0_wcgridpad781180e1c6f34a88b89e0ca072c046b8_1_wcmenucontent_0_PoolsBox_Pools_PoolsBox_0_ctl00_0_Ranks_0_Link2_' + str(i)
+    country_tag = soup.find('a', attrs={'id':id})
+    rank_tag =  country_tag.parent.parent.parent.previous_sibling.previous_sibling
+    games_tag = rank_tag.next_sibling.next_sibling.next_sibling.next_sibling
+    wins_tag = games_tag.next_sibling.next_sibling
+    losses_tag = wins_tag.next_sibling.next_sibling
+    tup = (country_tag.text.strip(), rank_tag.text.strip(), wins_tag.text.strip(), losses_tag.text.strip())
+    teams.append(tup)
+
+with open('team_data.csv', 'a') as csvfile:
+    writer = csv.writer(csvfile)
+    writer.writerow(['country', 'rank', 'wins', 'losses'])
+    for row in teams:
+        writer.writerow(row)
+
 
 matches = []
 for i in range(0,119):
@@ -37,8 +46,8 @@ for i in range(0,119):
         tup = (date.text.strip(), country_tag2.text.strip(), country_tag1.text.strip(), score_tag2.text.strip(), score_tag1.text.strip())
     matches.append(tup)
 
-with open('match_data.csv', 'wb') as out:
-    writer = csv.writer(out)
+with open('match_data.csv', 'a') as csvfile:
+    writer = csv.writer(csvfile)
     writer.writerow(['date', 'win_country', 'loss_country', 'win_score', 'loss_score'])
     for row in matches:
         writer.writerow(row)

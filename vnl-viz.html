@@ -1,22 +1,139 @@
 <!DOCTYPE html>
-<script src="lib/d3.v3.min.js"></script>
-
+<script src="/lib/d3.v3.min.js"></script>
+<body>
+<div id = "picker"></div>
+<div id = "chart"></div>
 <script type="text/javascript">
 
-var dataset = []];
+var match_data = [];
+var team_data = [];
+var country_codes = {
+    "France": "FRA",
+    "USA": "USA",
+    "Russia": "RUS",
+    "Brazil": "BRA",
+    "Poland": "POL",
+    "Serbia": "SRB",
+    "Italy": "ITA",
+    "Canada": "CAN",
+    "Japan": "JPN",
+    "Germany": "GER",
+    "Australia": "AUS",
+    "Bulgaria": "BUL",
+    "Iran": "IRI",
+    "Argentina": "ARG",
+    "China": "CHN",
+    "Korea": "KOR"
+}
 
+console.log("importing data...");
+// match data format: 'date', 'win_country', 'loss_country', 'win_score', 'loss_score'
 d3.csv("match_data.csv", function(data) {
-    header = d3.keys(data[0]);
+    // header = d3.keys(data[0]);
     data.forEach(function(d) {
         d["win_score"] = +d["win_score"];
         d["loss_score"] = +d["loss_score"];
     });
-    dataset = data;
-    console.log(dataset);
-    
+    match_data = data;
+});
+
+// team data format: 'country', 'rank', 'wins', 'losses'
+d3.csv("team_data.csv", function(data) {
+    // header = d3.keys(data[0]);
+    data.forEach(function(d) {
+        d["rank"] = +d["rank"];
+        d["wins"] = +d["wins"];
+        d["losses"] = +d["losses"];
+    });
+    team_data = data;
     go();
 });
 
 function go() {
-    console.log(dataset[0]);
+    console.log("go...");
+    var countries = [];
+    for (var i = 0; i < team_data.length; i++) {
+        countries.push(team_data[i].country);
+    }
+    countries.sort();
+    var selectedCountry = countries[0];
+    showGraph(selectedCountry);
+
+    d3.select("#picker")
+        .append("text")
+        .text("Country: ");
+
+    var select = d3.select("#picker")
+        .append("select")
+        .attr("class", "select")
+        .on("change", onchange);
+
+    var options = select.selectAll("options")
+        .data(countries)
+        .enter()
+        .append("option")
+        .text(function(d) { return d;   });
+
+    function onchange() {
+        var selectValue = d3.select("select").property("value");
+        console.log(selectValue);
+        selectedCountry = selectValue;
+        d3.select("svg").remove();
+        showGraph(selectedCountry);
+    }
+
+    function showGraph(selectedCountry) {
+        var selectedCountryCode = country_codes[selectedCountry];
+        var margin = {top: 10, bottom: 20, left: window.innerWidth*0.05, right: window.innerWidth*0.05};
+        var chartDiv = document.getElementById("chart");
+        var width = window.innerWidth * 0.8;
+        var height = window.innerHeight * 0.5;
+        var svg = d3.select("#chart")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .append("g")
+            .attr("transform", "translate (" + margin.left + ", " + margin.top + ") ");
+        svg.append("text")
+            .text(selectedCountry)
+            .attr("x", margin.left)
+            .attr("y", margin.top);
+
+        var record = [];
+        var match_count = 0;
+        for (var i = 0; i < 119; i++) {
+            var currMatch = match_data[i];
+            console.log(selectedCountryCode);
+            if (currMatch.win_country == selectedCountryCode) {
+                record.push("W " + currMatch.loss_country);
+                match_count ++;
+            } else if (currMatch.loss_country == selectedCountryCode) {
+                record.push("L " + currMatch.win_country);
+                match_count ++;
+            }
+        }
+
+
+
+
+        // var lines = svg.selectAll("line").data([
+        //     {x1: 0, y1: 0, x2: width, y2: 0},
+        //     {x1: width, y1: 0, x2: width, y2: height},
+        //     {x1: width, y1: height, x2: 0, y2: height},
+        //     {x1: 0, y1: height, x2: 0, y2: 0}
+        // ]);
+        // lines.enter()
+        //     .append("line")
+        //     .style("stroke-width", 20)
+        //     .style("stroke", "black")
+        //     .attr("x1", function (d) { return d.x1; })
+        //     .attr("y1", function (d) { return d.y1; })
+        //     .attr("x2", function (d) { return d.x2; })
+        //     .attr("y2", function (d) { return d.y2; });
+
+    }
 }
+
+</script>
+</body>
+</html>
