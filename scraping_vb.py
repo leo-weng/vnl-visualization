@@ -2,6 +2,7 @@
 import urllib2
 from bs4 import BeautifulSoup
 import csv
+import os
 
 # specify the url
 round_1_page = 'http://www.volleyball.world/en/vnl/men/resultsandranking/round1'
@@ -23,6 +24,7 @@ for i in range(0, 16):
     tup = (country_tag.text.strip(), rank_tag.text.strip(), wins_tag.text.strip(), losses_tag.text.strip())
     teams.append(tup)
 
+os.remove('team_data.csv')
 with open('team_data.csv', 'a') as csvfile:
     writer = csv.writer(csvfile)
     writer.writerow(['country', 'rank', 'wins', 'losses'])
@@ -42,10 +44,11 @@ for i in range(0,119):
     tup = ()
     if (score_tag1.text > score_tag2.text):
         tup = (date.text.strip(), country_tag1.text.strip(), country_tag2.text.strip(), score_tag1.text.strip(), score_tag2.text.strip())
-    else:
+    elif (score_tag1.text < score_tag2.text):
         tup = (date.text.strip(), country_tag2.text.strip(), country_tag1.text.strip(), score_tag2.text.strip(), score_tag1.text.strip())
     matches.append(tup)
 
+os.remove('match_data.csv')
 with open('match_data.csv', 'a') as csvfile:
     writer = csv.writer(csvfile)
     writer.writerow(['date', 'win_country', 'loss_country', 'win_score', 'loss_score'])
