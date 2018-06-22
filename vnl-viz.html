@@ -1,5 +1,9 @@
 <!DOCTYPE html>
 <script src="/lib/d3.v3.min.js"></script>
+<style>
+rect.win {fill: blue;}
+rect.loss {fill: red;}
+</style>
 <body>
 <div id = "picker"></div>
 <div id = "chart-title"></div>
@@ -81,8 +85,8 @@ function go() {
         var selectValue = d3.select("select").property("value");
         console.log(selectValue);
         selectedCountry = selectValue;
-        d3.select("#chart-title").select("svg").remove();
-        d3.select("#chart").select("svg").remove();
+        d3.select("#chart-title").selectAll("svg").remove();
+        d3.select("#chart").selectAll("svg").remove();
         showGraph(selectedCountry);
     }
 
@@ -121,74 +125,92 @@ function go() {
         var boxWidth = width * 0.9;
         var boxHeight = height * 0.8;
         var gridWidth = boxWidth/match_count;
-        var ind = 0;
 
-        var svg = d3.select("#chart")
-            .append("svg")
-            .attr("width", width)
-            .attr("height", height);
+        addGraph(selectedCountryCode);
 
-        var temp = "rect." + selectedCountryCode;
-        var g = svg.selectAll("g")
-            .data(match_data)
-            .enter()
-            .append("g");
-        g.append("rect")
-            .filter(function (d) {
-                return d["win_country"] == selectedCountryCode || d["loss_country"] == selectedCountryCode;
-            })
-            .attr("x", function (d) {
-                return margin.left + (ind++) * (gridWidth);
-            })
-            .attr("y", function (d) {
-                return margin.top;
-            })
-            .attr("width", gridWidth - 5)
-            .attr("height", gridWidth)
-            .attr("data", function(d) {
-                if (d["win_country"] == selectedCountryCode) {
-                    return "W " + d["loss_country"];
-                } else {
-                    return "L " + d["win_country"];
+        function addGraph(selectedCode) {
+            var svg = d3.select("#chart")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height);
+                // .attr("class", )
+
+            var g = svg.selectAll("g")
+                .data(match_data)
+                .enter()
+                .append("g");
+            g.append("rect")
+                .filter(function (d) {
+                    return d["win_country"] == selectedCode || d["loss_country"] == selectedCode;
+                })
+                .attr("x", function (d, i) {
+                    return margin.left + i * (gridWidth);
+                })
+                .attr("y", function (d) {
+                    return margin.top;
+                })
+                .attr("width", gridWidth - 5)
+                .attr("height", gridWidth)
+                .attr("class", function(d) {
+                    if (d["win_country"] == selectedCode) {
+                        return "rect win";
+                    } else {
+                        return "rect loss";
+                    }
+                })
+                .attr("data", function(d) {
+                    if (d["win_country"] == selectedCode) {
+                        return "W " + d["loss_country"];
+                    } else {
+                        return "L " + d["win_country"];
+                    }
+                });
+
+            g.append("text")
+                .filter(function (d) {
+                    return d["win_country"] == selectedCode || d["loss_country"] == selectedCode;
+                })
+                .attr("x", function(d, i) {
+                    return margin.left + i * (gridWidth) + gridWidth*0.1;
+                })
+                .attr("y", function(d) {
+                    return margin.top + gridWidth / 2;
+                })
+                // .style("fill", "white")
+                .text(function(d) {
+                    if (d["win_country"] == selectedCode) {
+                        return "W " + d["loss_country"];
+                    } else {
+                        return "L " + d["win_country"];
+                    }
+                });
+        }
+
+
+
+        Object.prototype.getKeyByValue = function( value ) {
+            for( var prop in this ) {
+                if( this.hasOwnProperty( prop ) ) {
+                     if( this[ prop ] === value )
+                         return prop;
                 }
-            })
-            .style("fill", function(d) {
-                if (d["win_country"] == selectedCountryCode) {
-                    return "blue";
-                } else {
-                    return "red";
-                }
-            });
+            }
+        }
 
-        ind = 0;
-        g.append("text")
-            .filter(function (d) {
-                return d["win_country"] == selectedCountryCode || d["loss_country"] == selectedCountryCode;
-            })
-            .attr("x", function(d) {
-                return margin.left + (ind++) * (gridWidth) + gridWidth*0.1;
-            })
-            .attr("y", function(d) {
-                return margin.top + gridWidth / 2;
-            })
-            // .style("fill", "white")
-            .text(function(d) {
-                if (d["win_country"] == selectedCountryCode) {
-                    return "W " + d["loss_country"];
-                } else {
-                    return "L " + d["win_country"];
-                }
-            });
+        var selectCountryCode2 = "";
+        var rect = d3.selectAll("svg g rect");
+        rect.on('click', function(d) {
+            var rect_class = d3.select(this).attr("class");
+            if (rect_class == "rect win") {
+                selectCountryCode2 = d["loss_country"];
+            } else {
+                selectCountryCode2 = d["win_country"];
+            }
+            console.log(selectCountryCode2);
+            addGraph(selectCountryCode2);
+        });
 
-        // var rect = d3.selectAll("svg g rect");
-        // rect.on('click', function(d) {
-        //     console.log('i was clicked' + d["win_country"]);
-        // })
 
-        var svg2 = d3.select("#chart")
-            .append("svg")
-            .attr("width", width)
-            .attr("height", height);
 
 
         // var lines = d3.select("#chart")
