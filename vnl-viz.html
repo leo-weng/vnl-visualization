@@ -1,8 +1,20 @@
 <!DOCTYPE html>
 <script src="/lib/d3.v3.min.js"></script>
 <style>
-rect.win {fill: blue;}
-rect.loss {fill: red;}
+:root {
+    --loss3: #ff0000;
+    --loss2: #ff5b5b;
+    --loss1: #ffaaaa;
+    --win3: #0050ff;
+    --win2: #4f86ff;
+    --win1: #89aeff;
+}
+rect.win3 {fill: var(--win3);}
+rect.win2 {fill: var(--win2);}
+rect.win1 {fill: var(--win1);}
+rect.loss3 {fill: var(--loss3);}
+rect.loss2 {fill: var(--loss2);}
+rect.loss1 {fill: var(--loss1);}
 </style>
 <body>
 <div id = "picker"></div>
@@ -30,6 +42,7 @@ var country_codes = {
     "China": "CHN",
     "Korea": "KOR"
 }
+
 
 console.log("importing data...");
 // match data format: 'date', 'win_country', 'loss_country', 'win_score', 'loss_score'
@@ -93,7 +106,7 @@ function go() {
     function showGraph(selectedCountry) {
         var selectedCountryCode = country_codes[selectedCountry];
         var margin = {top: 10, bottom: 20, left: window.innerWidth*0.05, right: window.innerWidth*0.05};
-        var width = window.innerWidth * 0.8;
+        var width = window.innerWidth * 0.95;
         var height = 50;
         var title = d3.select("#chart-title")
             .append("svg")
@@ -153,9 +166,21 @@ function go() {
                 .attr("height", gridWidth)
                 .attr("class", function(d) {
                     if (d["win_country"] == selectedCode) {
-                        return "rect win";
+                        if (d["win_score"] - d["loss_score"] == 3) {
+                            return "rect win3";
+                        } else if (d["win_score"] - d["loss_score"] == 2) {
+                            return "rect win2";
+                        } else if (d["win_score"] - d["loss_score"] == 1) {
+                            return "rect win1";
+                        }
                     } else {
-                        return "rect loss";
+                        if (d["win_score"] - d["loss_score"] == 3) {
+                            return "rect loss3";
+                        } else if (d["win_score"] - d["loss_score"] == 2) {
+                            return "rect loss2";
+                        } else if (d["win_score"] - d["loss_score"] == 1) {
+                            return "rect loss1";
+                        }
                     }
                 })
                 .attr("data", function(d) {
@@ -201,7 +226,7 @@ function go() {
         var rect = d3.selectAll("svg g rect");
         rect.on('click', function(d) {
             var rect_class = d3.select(this).attr("class");
-            if (rect_class == "rect win") {
+            if (rect_class.includes("rect win")) {
                 selectCountryCode2 = d["loss_country"];
             } else {
                 selectCountryCode2 = d["win_country"];
