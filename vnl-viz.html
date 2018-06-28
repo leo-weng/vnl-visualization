@@ -15,8 +15,69 @@ rect.win1 {fill: var(--win1);}
 rect.loss3 {fill: var(--loss3);}
 rect.loss2 {fill: var(--loss2);}
 rect.loss1 {fill: var(--loss1);}
+rect.selected {fill: yellow;}
+
+text.title {
+    display: inline-block;
+    font-family: sans-serif;
+    /* padding-left: 20%;
+    padding-right: 20%; */
+    text-anchor: middle;
+    font-size: 50px;
+    alignment-baseline: hanging;
+}
+
+text.country_label {
+    display: inline-block;
+    font-family: sans-serif;
+    margin-left: 5%;
+    padding-left: 10px;
+    padding-top: 10px;
+}
+
+text.country_text {
+    display: inline-block;
+    font-family: sans-serif;
+    font-size: 25px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-top: 100px;
+    alignment-baseline: hanging;
+}
+
+text.box_text {
+    font-size: 12px;
+    fill: black;
+    text-anchor: left;
+    display: inline-block;
+}
+
+.svg-container-flag  {
+    padding-left: 10%;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    display: inline-block;
+}
+
+.svg-container-country  {
+    padding-left: 5px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    display: inline-block;
+    alignment-baseline: middle;
+}
+
+.svg-container-one {
+    padding-bottom: 20px;
+}
+.svg-content-responsive {
+    display: inline-block;
+}
+
 </style>
+<link href="./node_modules/flag-icon-css/css/flag-icon.css" rel="stylesheet">
 <body>
+<div id = "page-title"></div>
 <div id = "picker"></div>
 <div id = "chart-title"></div>
 <div id = "chart"></div>
@@ -41,6 +102,25 @@ var country_codes = {
     "Argentina": "ARG",
     "China": "CHN",
     "Korea": "KOR"
+}
+
+var flag_codes = {
+    "FRA": "fr",
+    "USA": "us",
+    "RUS": "ru",
+    "BRA": "br",
+    "POL": "pl",
+    "SRB": "rs",
+    "ITA": "it",
+    "CAN": "ca",
+    "JPN": "jp",
+    "GER": "de",
+    "AUS": "au",
+    "BUL": "bg",
+    "IRA": "ir",
+    "ARG": "ar",
+    "CHN": "cn",
+    "KOR": "kr"
 }
 
 
@@ -69,6 +149,20 @@ d3.csv("team_data.csv", function(data) {
 
 function go() {
     console.log("go...");
+    var title = d3.select("#page-title")
+        .append("div")
+        .classed("svg-container-title", true)
+        .append("svg")
+        .attr("preserveAspectRatio", "xMinYMin meet")
+        .attr("viewBox", "0 0 " + window.innerWidth + " " + 65)
+        .classed("svg-content-responsive", true);
+
+    title.append("text")
+        .text("VNL Preliminary Round")
+        .attr("x", window.innerWidth/2)
+        .attr("y", "15")
+        .attr("class", "title");
+
     var countries = [];
     for (var i = 0; i < team_data.length; i++) {
         countries.push(team_data[i].country);
@@ -77,11 +171,10 @@ function go() {
     var selectedCountry = countries[0];
     showGraph(selectedCountry);
 
-    var margin = {top: 10, bottom: 20, left: window.innerWidth*0.05, right: window.innerWidth*0.05};
-
     d3.select("#picker")
         .append("text")
-        .text("Country: ");
+        .text("Country: ")
+        .attr("class", "country_label");
 
     var select = d3.select("#picker")
         .append("select")
@@ -98,30 +191,43 @@ function go() {
         var selectValue = d3.select("select").property("value");
         console.log(selectValue);
         selectedCountry = selectValue;
-        d3.select("#chart-title").selectAll("svg").remove();
-        d3.select("#chart").selectAll("svg").remove();
+        d3.select("#chart-title").selectAll("div").remove();
+        d3.select("#chart").selectAll("div").remove();
         showGraph(selectedCountry);
     }
 
     function showGraph(selectedCountry) {
-        var selectedCountryCode = country_codes[selectedCountry];
         var margin = {top: 10, bottom: 20, left: window.innerWidth*0.05, right: window.innerWidth*0.05};
-        var width = window.innerWidth * 0.95;
-        var height = 50;
-        var title = d3.select("#chart-title")
+        var selectedCountryCode = country_codes[selectedCountry];
+        var width = window.innerWidth * 0.85;
+        var height = 30;
+        d3.select("#chart-title")
+            .append("div")
+            .classed("svg-container-flag", true)
             .append("svg")
-            .attr("width", width)
+            .attr("width", 50)
+            .attr("height", 50)
+            // .append("span")
+            .attr("class", function() {
+                return "flag-icon-background flag-icon-" + flag_codes[selectedCountryCode];
+            });
+
+        d3.select("#chart-title")
+            .append("div")
+            .classed("svg-container-country", true)
+            .append("svg")
+            .attr("width", 200)
             .attr("height", height)
-            .append("g")
-            .attr("transform", "translate (" + margin.left + ", " + margin.top + ") ");
-        title.append("text")
+            .attr("class", "svg_country")
+            .append("text")
             .text(selectedCountry)
-            .attr("x", margin.left)
-            .attr("y", margin.top);
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("class", "country_text");
 
         var record = [];
         var match_count = 0;
-        for (var i = 0; i < 119; i++) {
+        for (var i = 0; i < 120; i++) {
             var currMatch = match_data[i];
             console.log(selectedCountryCode);
             if (currMatch.win_country == selectedCountryCode) {
@@ -138,24 +244,28 @@ function go() {
         var boxWidth = width * 0.9;
         var boxHeight = height * 0.3;
         var gridWidth = boxWidth/match_count;
-
+        var replacementClass = "";
+        console.log("gridWidth: ", gridWidth);
         addGraph(selectedCountryCode, "one");
 
         function addGraph(selectedCode, layer) {
             var svg = d3.select("#chart")
+                .append("div")
+                .classed("svg-container-" + layer, true)
                 .append("svg")
-                .attr("width", width)
-                .attr("height", boxHeight)
-                .attr("class", layer);
+                .attr("preserveAspectRatio", "xMinYMin meet")
+                .attr("viewBox", "0 0 " + width + " " + boxHeight)
+                .classed("svg-content-responsive", true);
 
             var g = svg.selectAll("g")
                 .data(match_data)
                 .enter()
-                .append("g");
-            g.append("rect")
+                .append("g")
                 .filter(function (d) {
                     return d["win_country"] == selectedCode || d["loss_country"] == selectedCode;
-                })
+                });
+
+            g.append("rect")
                 .attr("x", function (d, i) {
                     return margin.left + i * (gridWidth);
                 })
@@ -192,16 +302,18 @@ function go() {
                 });
 
             g.append("text")
-                .filter(function (d) {
-                    return d["win_country"] == selectedCode || d["loss_country"] == selectedCode;
-                })
                 .attr("x", function(d, i) {
                     return margin.left + i * (gridWidth) + gridWidth*0.1;
                 })
                 .attr("y", function(d) {
                     return margin.top + gridWidth / 2;
                 })
-                // .style("fill", "white")
+                .style("font-size", function(d) {
+                    // return Math.min(gridWidth, (gridWidth-8) );
+                    return (gridWidth-8) / this.getComputedTextLength() * 10 + "px";
+                })
+                .attr("dy", ".10em")
+                .attr("class", "box_text")
                 .text(function(d) {
                     if (d["win_country"] == selectedCode) {
                         return "W " + d["loss_country"];
@@ -210,8 +322,6 @@ function go() {
                     }
                 });
         }
-
-
 
         Object.prototype.getKeyByValue = function( value ) {
             for( var prop in this ) {
@@ -223,19 +333,28 @@ function go() {
         }
 
         var selectCountryCode2 = "";
-        var rect = d3.selectAll("svg g rect");
-        rect.on('click', function(d) {
-            var rect_class = d3.select(this).attr("class");
-            if (rect_class.includes("rect win")) {
-                selectCountryCode2 = d["loss_country"];
-            } else {
-                selectCountryCode2 = d["win_country"];
-            }
-            console.log(selectCountryCode2);
-            d3.select("#chart").selectAll("svg.two").remove();
-            addGraph(selectCountryCode2, "two");
-        });
+        d3.selectAll("svg g rect")
+            .on('click', function(d) {
+                d3.selectAll("svg g rect")
+                    .filter(function() {
+                        return d3.select(this).attr("class") == "rect selected"; })
+                    .attr("class", replacementClass);
+                var rect_class = d3.select(this).attr("class");
+                replacementClass = rect_class;
+                if (rect_class.includes("rect win")) {
+                    selectCountryCode2 = d["loss_country"];
+                } else {
+                    selectCountryCode2 = d["win_country"];
+                }
+                // console.log(selectCountryCode2);
+
+                console.log(replacementClass);
+                d3.select(this).attr("class", "rect selected");
+                d3.select("#chart").selectAll("div.svg-container-two").remove();
+                addGraph(selectCountryCode2, "two");
+            });
     }
+
 }
 
 </script>
