@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <script src="/lib/d3.v3.min.js"></script>
+<link href="https://fonts.googleapis.com/css?family=Titillium+Web" rel="stylesheet">
 <style>
 :root {
     --loss3: #ff0000;
@@ -8,6 +9,8 @@
     --win3: #0050ff;
     --win2: #4f86ff;
     --win1: #89aeff;
+    --font-body: 'Titillium Web', sans-serif;
+
 }
 rect.win3 {fill: var(--win3);}
 rect.win2 {fill: var(--win2);}
@@ -17,11 +20,17 @@ rect.loss2 {fill: var(--loss2);}
 rect.loss1 {fill: var(--loss1);}
 rect.selected {fill: yellow;}
 
+body {
+    background-color: #c5d2db;
+}
+
 text.title {
     display: inline-block;
-    font-family: sans-serif;
+    font-family: var(--font-body);
     /* padding-left: 20%;
     padding-right: 20%; */
+    padding-top: 20px;
+    padding-bottom: 20px;
     text-anchor: middle;
     font-size: 50px;
     alignment-baseline: hanging;
@@ -29,42 +38,43 @@ text.title {
 
 text.country_label {
     display: inline-block;
-    font-family: sans-serif;
+    font-family: var(--font-body);
+    font-size: 20px;
     margin-left: 5%;
     padding-left: 10px;
+    padding-right: 10px;
     padding-top: 10px;
 }
 
 text.country_text {
     display: inline-block;
-    font-family: sans-serif;
+    font-family: var(--font-body);
     font-size: 25px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    margin-top: 100px;
     alignment-baseline: hanging;
 }
 
 text.box_text {
     font-size: 12px;
+    font-family: var(--font-body);
     fill: black;
     text-anchor: left;
     display: inline-block;
 }
 
 .svg-container-flag  {
-    padding-left: 10%;
+    padding-left: 10px;
+    margin-left: 5%;
     margin-top: 20px;
     margin-bottom: 20px;
     display: inline-block;
 }
 
 .svg-container-country  {
-    padding-left: 5px;
+    padding-left: 15px;
     margin-top: 20px;
     margin-bottom: 20px;
     display: inline-block;
-    alignment-baseline: middle;
+    alignment-baseline: hanging;
 }
 
 .svg-container-one {
@@ -154,7 +164,7 @@ function go() {
         .classed("svg-container-title", true)
         .append("svg")
         .attr("preserveAspectRatio", "xMinYMin meet")
-        .attr("viewBox", "0 0 " + window.innerWidth + " " + 65)
+        .attr("viewBox", "0 0 " + window.innerWidth + " " + 75)
         .classed("svg-content-responsive", true);
 
     title.append("text")
@@ -217,12 +227,13 @@ function go() {
             .classed("svg-container-country", true)
             .append("svg")
             .attr("width", 200)
-            .attr("height", height)
+            .attr("height", 50)
             .attr("class", "svg_country")
             .append("text")
             .text(selectedCountry)
             .attr("x", 0)
             .attr("y", 0)
+            .attr("dy", "0.5em")
             .attr("class", "country_text");
 
         var record = [];
@@ -245,7 +256,6 @@ function go() {
         var boxHeight = height * 0.3;
         var gridWidth = boxWidth/match_count;
         var replacementClass = "";
-        console.log("gridWidth: ", gridWidth);
         addGraph(selectedCountryCode, "one");
 
         function addGraph(selectedCode, layer) {
@@ -301,36 +311,60 @@ function go() {
                     }
                 });
 
+            var text_min = 10000;
             g.append("text")
                 .attr("x", function(d, i) {
                     return margin.left + i * (gridWidth) + gridWidth*0.1;
                 })
                 .attr("y", function(d) {
-                    return margin.top + gridWidth / 2;
+                    return margin.top;
                 })
-                .style("font-size", function(d) {
-                    // return Math.min(gridWidth, (gridWidth-8) );
-                    return (gridWidth-8) / this.getComputedTextLength() * 10 + "px";
-                })
-                .attr("dy", ".10em")
+                .attr("dy", "0.5em")
                 .attr("class", "box_text")
+                .attr("alignment-baseline", "hanging")
                 .text(function(d) {
                     if (d["win_country"] == selectedCode) {
-                        return "W " + d["loss_country"];
+                        return "W";
                     } else {
-                        return "L " + d["win_country"];
+                        return "L";
                     }
+                });
+
+            g.append("text")
+                .attr("x", function(d, i) {
+                    return margin.left + i * (gridWidth) + gridWidth*0.1;
+                })
+                .attr("y", function(d) {
+                    return margin.top;
+                })
+                .attr("dy", "1.5em")
+                .attr("class", "box_text")
+                .attr("alignment-baseline", "hanging")
+                .text(function(d) {
+                    if (d["win_country"] == selectedCode) {
+                        return d["loss_country"];
+                    } else {
+                        return d["win_country"];
+                    }
+                })
+                .each(function(d) {
+                    text_min = Math.min(text_min, (gridWidth-8) / this.getComputedTextLength() * 10)
+                });
+            // console.log("text_min: " + text_min);
+            d3.selectAll("svg g text")
+                .style("font-size", function(d) {
+                    return text_min + "px";
                 });
         }
 
-        Object.prototype.getKeyByValue = function( value ) {
-            for( var prop in this ) {
-                if( this.hasOwnProperty( prop ) ) {
-                     if( this[ prop ] === value )
-                         return prop;
-                }
-            }
-        }
+        // Object.prototype.getKeyByValue = function( value ) {
+        //     for( var prop in this ) {
+        //         if( this.hasOwnProperty( prop ) ) {
+        //              if( this[ prop ] === value )
+        //                  return prop;
+        //         }
+        //     }
+        // }
 
         var selectCountryCode2 = "";
         d3.selectAll("svg g rect")
