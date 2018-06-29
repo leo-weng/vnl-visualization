@@ -89,7 +89,8 @@ text.box_text {
 <body>
 <div id = "page-title"></div>
 <div id = "picker"></div>
-<div id = "chart-title"></div>
+<div id = "chart-title" style = "width: 50%; float:left;"></div>
+<div id = "chart-detail" style = "width: 50%; float:left;"></div>
 <div id = "chart"></div>
 <script type="text/javascript">
 
@@ -135,12 +136,14 @@ var flag_codes = {
 
 
 console.log("importing data...");
-// match data format: 'date', 'win_country', 'loss_country', 'win_score', 'loss_score'
+// match data format: 'date', 'win_country', 'loss_country', 'win_score', 'loss_score', 'win_player', 'win_kills', 'loss_player', 'loss_kills'
 d3.csv("match_data.csv", function(data) {
     // header = d3.keys(data[0]);
     data.forEach(function(d) {
         d["win_score"] = +d["win_score"];
         d["loss_score"] = +d["loss_score"];
+        d["win_kills"] = +d["win_kills"];
+        d["loss_kills"] = +d["loss_kills"];
     });
     match_data = data;
 });
@@ -381,12 +384,27 @@ function go() {
                     selectCountryCode2 = d["win_country"];
                 }
                 // console.log(selectCountryCode2);
+                // console.log(d);
+                var win_hitter_stats = [d["win_player"], d["win_kills"]];
+                var loss_hitter_stats = [d["loss_player"], d["loss_kills"]];
 
                 console.log(replacementClass);
                 d3.select(this).attr("class", "rect selected");
                 d3.select("#chart").selectAll("div.svg-container-two").remove();
                 addGraph(selectCountryCode2, "two");
+                addDetail(d["win_country"], d["loss_country"], win_hitter_stats, loss_hitter_stats);
             });
+    }
+
+    function addDetail(win_country, loss_country, win_hitter_stats, loss_hitter_stats) {
+        // console.log(win_country, loss_country, win_hitter_stats, loss_hitter_stats);
+        var svg = d3.select("#chart-detail")
+            .append("div")
+            .classed("svg-container-detail", true)
+            .append("svg")
+            .attr("preserveAspectRatio", "xMinYMin meet")
+            .attr("viewBox", width/2 + " 0 " + width + " " + boxHeight)
+            .classed("svg-content-responsive", true);
     }
 
 }
