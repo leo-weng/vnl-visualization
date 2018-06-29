@@ -127,7 +127,7 @@ var flag_codes = {
     "GER": "de",
     "AUS": "au",
     "BUL": "bg",
-    "IRA": "ir",
+    "IRI": "ir",
     "ARG": "ar",
     "CHN": "cn",
     "KOR": "kr"
@@ -174,9 +174,9 @@ function go() {
         .attr("class", "title");
 
     var countries = [];
-    for (var i = 0; i < team_data.length; i++) {
-        countries.push(team_data[i].country);
-    }
+    team_data.forEach(function(d) {
+        countries.push(d["country"]);
+    })
     countries.sort();
     var selectedCountry = countries[0];
     showGraph(selectedCountry);
