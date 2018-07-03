@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="/lib/d3.v3.min.js"></script>
 <link href="https://fonts.googleapis.com/css?family=Titillium+Web" rel="stylesheet">
 <style>
@@ -10,7 +11,6 @@
     --win2: #4f86ff;
     --win1: #89aeff;
     --font-body: 'Titillium Web', sans-serif;
-
 }
 rect.win3 {fill: var(--win3);}
 rect.win2 {fill: var(--win2);}
@@ -19,6 +19,11 @@ rect.loss3 {fill: var(--loss3);}
 rect.loss2 {fill: var(--loss2);}
 rect.loss1 {fill: var(--loss1);}
 rect.selected {fill: yellow;}
+rect.detail_rect {
+    fill: none;
+    stroke: black;
+    stroke-width: 3;
+}
 
 body {
     background-color: #c5d2db;
@@ -32,14 +37,14 @@ text.title {
     padding-top: 20px;
     padding-bottom: 20px;
     text-anchor: middle;
-    font-size: 50px;
+    font-size: 8vw;
     alignment-baseline: hanging;
 }
 
 text.country_label {
     display: inline-block;
     font-family: var(--font-body);
-    font-size: 20px;
+    font-size: 4vw;
     margin-left: 5%;
     padding-left: 10px;
     padding-right: 10px;
@@ -49,16 +54,23 @@ text.country_label {
 text.country_text {
     display: inline-block;
     font-family: var(--font-body);
-    font-size: 25px;
+    font-size: 4vw;
     alignment-baseline: hanging;
 }
 
 text.box_text {
-    font-size: 12px;
+    font-size: 2vw;
     font-family: var(--font-body);
     fill: black;
     text-anchor: left;
     display: inline-block;
+}
+
+text.detail_text {
+    font-size: 2.2vw;
+    font-family: var(--font-body);
+    fill: black;
+    alignment-baseline: hanging;
 }
 
 .svg-container-flag  {
@@ -84,13 +96,51 @@ text.box_text {
     display: inline-block;
 }
 
+#chart-title {
+    width: 40%;
+    float: left;
+}
+#chart-detail {
+    width: 60%;
+    float: left;
+}
+
+@media screen and (max-width: 600px) {
+  #chart-title, #chart-detail {
+      width: 100%;
+  }
+}
+
+/* @media screen and (min-width: 1000px) {
+  text.title { font-size: 5vw; }
+  text.country_label { font-size: 3vw; }
+  text.country_text { font-size: 3.4vw; }
+
+  #picker {
+      width: 20%;
+      float: left;
+      padding-top: 10px;
+  }
+
+  #chart-title {
+      width: 35%;
+      float: left;
+  }
+
+  #chart-detail {
+      width: 40%;
+      float: left;
+  }
+
+} */
+
 </style>
 <link href="./node_modules/flag-icon-css/css/flag-icon.css" rel="stylesheet">
 <body>
 <div id = "page-title"></div>
 <div id = "picker"></div>
-<div id = "chart-title" style = "width: 50%; float:left;"></div>
-<div id = "chart-detail" style = "width: 50%; float:left;"></div>
+<div id = "chart-title"></div>
+<div id = "chart-detail"></div>
 <div id = "chart"></div>
 <script type="text/javascript">
 
@@ -173,7 +223,7 @@ function go() {
     title.append("text")
         .text("VNL Preliminary Round")
         .attr("x", window.innerWidth/2)
-        .attr("y", "15")
+        .attr("y", 0)
         .attr("class", "title");
 
     var countries = [];
@@ -206,6 +256,7 @@ function go() {
         selectedCountry = selectValue;
         d3.select("#chart-title").selectAll("div").remove();
         d3.select("#chart").selectAll("div").remove();
+        d3.select("#chart-detail").selectAll("div").remove();
         showGraph(selectedCountry);
     }
 
@@ -218,8 +269,8 @@ function go() {
             .append("div")
             .classed("svg-container-flag", true)
             .append("svg")
-            .attr("width", 50)
-            .attr("height", 50)
+            .attr("width", window.innerWidth*0.10)
+            .attr("height", window.innerWidth*0.10*3/4)
             // .append("span")
             .attr("class", function() {
                 return "flag-icon-background flag-icon-" + flag_codes[selectedCountryCode];
@@ -229,14 +280,14 @@ function go() {
             .append("div")
             .classed("svg-container-country", true)
             .append("svg")
-            .attr("width", 200)
-            .attr("height", 50)
+            .attr("width", window.innerWidth*0.20)
+            .attr("height", window.innerWidth*0.10*3/4)
             .attr("class", "svg_country")
             .append("text")
             .text(selectedCountry)
             .attr("x", 0)
             .attr("y", 0)
-            .attr("dy", "0.5em")
+            .attr("dy", "0.25em")
             .attr("class", "country_text");
 
         var record = [];
@@ -370,6 +421,8 @@ function go() {
         // }
 
         var selectCountryCode2 = "";
+        var high_score_stats = [];
+        var low_score_stats = [];
         d3.selectAll("svg g rect")
             .on('click', function(d) {
                 d3.selectAll("svg g rect")
@@ -385,26 +438,94 @@ function go() {
                 }
                 // console.log(selectCountryCode2);
                 // console.log(d);
-                var win_hitter_stats = [d["win_player"], d["win_kills"]];
-                var loss_hitter_stats = [d["loss_player"], d["loss_kills"]];
+                if (d["win_kills"] >= d["loss_kills"]) {
+                    high_score_stats = [d["win_country"], d["win_player"], d["win_kills"]];
+                    low_score_stats = [d["loss_country"], d["loss_player"], d["loss_kills"]];
+                } else {
+                    low_score_stats = [d["win_country"], d["win_player"], d["win_kills"]];
+                    high_score_stats = [d["loss_country"], d["loss_player"], d["loss_kills"]];
+                }
 
                 console.log(replacementClass);
                 d3.select(this).attr("class", "rect selected");
                 d3.select("#chart").selectAll("div.svg-container-two").remove();
                 addGraph(selectCountryCode2, "two");
-                addDetail(d["win_country"], d["loss_country"], win_hitter_stats, loss_hitter_stats);
+                addDetail(high_score_stats, low_score_stats);
             });
     }
 
-    function addDetail(win_country, loss_country, win_hitter_stats, loss_hitter_stats) {
-        // console.log(win_country, loss_country, win_hitter_stats, loss_hitter_stats);
+    function addDetail(high_score_stats, low_score_stats) {
+        d3.select("#chart-detail").selectAll("div").remove();
+
+        // d3.select("#chart-detail")
+        //     .append("div")
+        //     .classed("svg-container-flag", true)
+        //     .append("svg")
+        //     .attr("class", function(){
+        //         return "flag-icon flag-icon-" + flag_codes[high_score_stats[0]];
+        //     });
+
         var svg = d3.select("#chart-detail")
             .append("div")
             .classed("svg-container-detail", true)
             .append("svg")
             .attr("preserveAspectRatio", "xMinYMin meet")
-            .attr("viewBox", width/2 + " 0 " + width + " " + boxHeight)
-            .classed("svg-content-responsive", true);
+            .attr("viewBox", "0 0 " + 250 + " " + 75);
+            // .attr("width", "75%")
+            // .classed("svg-content-responsive", true);
+        svg.append("text")
+            .attr("preserveAspectRatio", "xMinYMin meet")
+            .attr("viewBox", "0 0 " + 250 + " " + 75)
+            .attr("class", "svg-container-flag");
+        // svg.append("svg")
+        //     .attr("width", 20)
+        //     .attr("height", 20)
+        //     .attr("class", function(){
+        //         return "flag-icon flag-icon-" + flag_codes[high_score_stats[0]];
+        //     });
+        // svg.append("div")
+        //     .classed("svg-container-flag", true)
+        //     .append("svg")
+        //     .attr("class", function(){
+        //         return "flag-icon flag-icon-" + flag_codes[high_score_stats[0]];
+        //     });
+        svg.append("rect")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .attr("class", "detail_rect");
+        svg.append("text")
+            .text("Best Scorers:")
+            .attr("class", "detail_text")
+            .attr("x", "10")
+            .attr("y", "5");
+        // svg.append("g")
+        //     .attr("width", "100")
+        //     .attr("height", "100")
+        //     .attr("x", 10)
+        //     .attr("y", 25)
+        //     .append("span")
+        //     .attr("width", "100")
+        //     .attr("height", "100")
+        //     .attr("x", 10)
+        //     .attr("y", 25)
+        //     // .append("span")
+        //     .attr("class", function(){
+        //         return "flag-icon flag-icon-" + flag_codes[high_score_stats[0]];
+        //     });
+            // .text("TEST");
+            // .style("display", "inline-block");
+        svg.append("text")
+            .text(high_score_stats[0] + ": " + high_score_stats[2] + " - " + high_score_stats[1])
+            .attr("class", "detail_text")
+            .attr("x", "25")
+            .attr("y", "25");
+        svg.append("text")
+            .text(low_score_stats[0] + ": " + low_score_stats[2] + " - " + low_score_stats[1])
+            .attr("class", "detail_text")
+            .attr("x", "25")
+            .attr("y", "45");
     }
 
 }
