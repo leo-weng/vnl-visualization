@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="/lib/d3.v3.min.js"></script>
+<script src="/lib/d3/d3.v3.min.js"></script>
 <link href="https://fonts.googleapis.com/css?family=Titillium+Web" rel="stylesheet">
 <style>
 :root {
@@ -24,11 +24,9 @@ rect.detail_rect {
     stroke: black;
     stroke-width: 3;
 }
-
 body {
     background-color: #c5d2db;
 }
-
 text.title {
     display: inline-block;
     font-family: var(--font-body);
@@ -40,7 +38,6 @@ text.title {
     font-size: 8vw;
     alignment-baseline: hanging;
 }
-
 text.country_label {
     display: inline-block;
     font-family: var(--font-body);
@@ -50,14 +47,12 @@ text.country_label {
     padding-right: 10px;
     padding-top: 10px;
 }
-
 text.country_text {
     display: inline-block;
     font-family: var(--font-body);
     font-size: 4vw;
     alignment-baseline: hanging;
 }
-
 text.box_text {
     font-size: 2vw;
     font-family: var(--font-body);
@@ -65,14 +60,12 @@ text.box_text {
     text-anchor: left;
     display: inline-block;
 }
-
 text.detail_text {
     font-size: 2.2vw;
     font-family: var(--font-body);
     fill: black;
     alignment-baseline: hanging;
 }
-
 .svg-container-flag  {
     padding-left: 10px;
     margin-left: 5%;
@@ -80,7 +73,6 @@ text.detail_text {
     margin-bottom: 20px;
     display: inline-block;
 }
-
 .svg-container-country  {
     padding-left: 15px;
     margin-top: 20px;
@@ -88,14 +80,12 @@ text.detail_text {
     display: inline-block;
     alignment-baseline: hanging;
 }
-
 .svg-container-one {
     padding-bottom: 20px;
 }
 .svg-content-responsive {
     display: inline-block;
 }
-
 #chart-title {
     width: 40%;
     float: left;
@@ -104,36 +94,29 @@ text.detail_text {
     width: 60%;
     float: left;
 }
-
 @media screen and (max-width: 600px) {
   #chart-title, #chart-detail {
       width: 100%;
   }
 }
-
 /* @media screen and (min-width: 1000px) {
   text.title { font-size: 5vw; }
   text.country_label { font-size: 3vw; }
   text.country_text { font-size: 3.4vw; }
-
   #picker {
       width: 20%;
       float: left;
       padding-top: 10px;
   }
-
   #chart-title {
       width: 35%;
       float: left;
   }
-
   #chart-detail {
       width: 40%;
       float: left;
   }
-
 } */
-
 </style>
 <link href="./node_modules/flag-icon-css/css/flag-icon.css" rel="stylesheet">
 <body>
@@ -143,7 +126,6 @@ text.detail_text {
 <div id = "chart-detail"></div>
 <div id = "chart"></div>
 <script type="text/javascript">
-
 var match_data = [];
 var team_data = [];
 var country_codes = {
@@ -164,7 +146,6 @@ var country_codes = {
     "China": "CHN",
     "Korea": "KOR"
 }
-
 var flag_codes = {
     "FRA": "fr",
     "USA": "us",
@@ -183,8 +164,6 @@ var flag_codes = {
     "CHN": "cn",
     "KOR": "kr"
 }
-
-
 console.log("importing data...");
 // match data format: 'date', 'win_country', 'loss_country', 'win_score', 'loss_score', 'win_player', 'win_kills', 'loss_player', 'loss_kills'
 d3.csv("match_data.csv", function(data) {
@@ -197,7 +176,6 @@ d3.csv("match_data.csv", function(data) {
     });
     match_data = data;
 });
-
 // team data format: 'country', 'rank', 'wins', 'losses'
 d3.csv("team_data.csv", function(data) {
     // header = d3.keys(data[0]);
@@ -209,7 +187,6 @@ d3.csv("team_data.csv", function(data) {
     team_data = data;
     go();
 });
-
 function go() {
     console.log("go...");
     var title = d3.select("#page-title")
@@ -219,13 +196,11 @@ function go() {
         .attr("preserveAspectRatio", "xMinYMin meet")
         .attr("viewBox", "0 0 " + window.innerWidth + " " + 75)
         .classed("svg-content-responsive", true);
-
     title.append("text")
         .text("VNL Preliminary Round")
         .attr("x", window.innerWidth/2)
         .attr("y", 0)
         .attr("class", "title");
-
     var countries = [];
     team_data.forEach(function(d) {
         countries.push(d["country"]);
@@ -233,23 +208,19 @@ function go() {
     countries.sort();
     var selectedCountry = countries[0];
     showGraph(selectedCountry);
-
     d3.select("#picker")
         .append("text")
         .text("Country: ")
         .attr("class", "country_label");
-
     var select = d3.select("#picker")
         .append("select")
         .attr("class", "select")
         .on("change", onchange);
-
     var options = select.selectAll("options")
         .data(countries)
         .enter()
         .append("option")
         .text(function(d) { return d;   });
-
     function onchange() {
         var selectValue = d3.select("select").property("value");
         console.log(selectValue);
@@ -259,7 +230,6 @@ function go() {
         d3.select("#chart-detail").selectAll("div").remove();
         showGraph(selectedCountry);
     }
-
     function showGraph(selectedCountry) {
         var margin = {top: 10, bottom: 20, left: window.innerWidth*0.05, right: window.innerWidth*0.05};
         var selectedCountryCode = country_codes[selectedCountry];
@@ -275,7 +245,6 @@ function go() {
             .attr("class", function() {
                 return "flag-icon-background flag-icon-" + flag_codes[selectedCountryCode];
             });
-
         d3.select("#chart-title")
             .append("div")
             .classed("svg-container-country", true)
@@ -289,7 +258,6 @@ function go() {
             .attr("y", 0)
             .attr("dy", "0.25em")
             .attr("class", "country_text");
-
         var record = [];
         var match_count = 0;
         for (var i = 0; i < 120; i++) {
@@ -303,7 +271,6 @@ function go() {
                 match_count ++;
             }
         }
-
         width = window.innerWidth * 0.8;
         height = window.innerHeight * 0.5;
         var boxWidth = width * 0.9;
@@ -311,7 +278,6 @@ function go() {
         var gridWidth = boxWidth/match_count;
         var replacementClass = "";
         addGraph(selectedCountryCode, "one");
-
         function addGraph(selectedCode, layer) {
             var svg = d3.select("#chart")
                 .append("div")
@@ -320,7 +286,6 @@ function go() {
                 .attr("preserveAspectRatio", "xMinYMin meet")
                 .attr("viewBox", "0 0 " + width + " " + boxHeight)
                 .classed("svg-content-responsive", true);
-
             var g = svg.selectAll("g")
                 .data(match_data)
                 .enter()
@@ -328,7 +293,6 @@ function go() {
                 .filter(function (d) {
                     return d["win_country"] == selectedCode || d["loss_country"] == selectedCode;
                 });
-
             g.append("rect")
                 .attr("x", function (d, i) {
                     return margin.left + i * (gridWidth);
@@ -364,7 +328,6 @@ function go() {
                         return "L " + d["win_country"];
                     }
                 });
-
             var text_min = 10000;
             g.append("text")
                 .attr("x", function(d, i) {
@@ -383,7 +346,6 @@ function go() {
                         return "L";
                     }
                 });
-
             g.append("text")
                 .attr("x", function(d, i) {
                     return margin.left + i * (gridWidth) + gridWidth*0.1;
@@ -410,7 +372,6 @@ function go() {
                     return text_min + "px";
                 });
         }
-
         // Object.prototype.getKeyByValue = function( value ) {
         //     for( var prop in this ) {
         //         if( this.hasOwnProperty( prop ) ) {
@@ -419,7 +380,6 @@ function go() {
         //         }
         //     }
         // }
-
         var selectCountryCode2 = "";
         var high_score_stats = [];
         var low_score_stats = [];
@@ -445,7 +405,6 @@ function go() {
                     low_score_stats = [d["win_country"], d["win_player"], d["win_kills"]];
                     high_score_stats = [d["loss_country"], d["loss_player"], d["loss_kills"]];
                 }
-
                 console.log(replacementClass);
                 d3.select(this).attr("class", "rect selected");
                 d3.select("#chart").selectAll("div.svg-container-two").remove();
@@ -453,10 +412,8 @@ function go() {
                 addDetail(high_score_stats, low_score_stats);
             });
     }
-
     function addDetail(high_score_stats, low_score_stats) {
         d3.select("#chart-detail").selectAll("div").remove();
-
         // d3.select("#chart-detail")
         //     .append("div")
         //     .classed("svg-container-flag", true)
@@ -464,7 +421,6 @@ function go() {
         //     .attr("class", function(){
         //         return "flag-icon flag-icon-" + flag_codes[high_score_stats[0]];
         //     });
-
         var svg = d3.select("#chart-detail")
             .append("div")
             .classed("svg-container-detail", true)
@@ -527,9 +483,7 @@ function go() {
             .attr("x", "25")
             .attr("y", "45");
     }
-
 }
-
 </script>
 </body>
 </html>

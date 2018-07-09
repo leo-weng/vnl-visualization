@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+    <!-- stylesheets -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Titillium+Web" rel="stylesheet">
+    <!-- <link href="stylesheet.css" rel="stylesheet"> -->
+    <link href="./node_modules/flag-icon-css/css/flag-icon.css" rel="stylesheet">
+</head>
+
+<body>
+<div id = "page-title"></div>
+<div id = "picker"></div>
+<div id = "chart-title"></div>
+<div id = "chart-detail"></div>
+<div id = "chart"></div>
+
+<!-- javascript libraries -->
+<script src="/lib/d3/d3.v3.min.js"></script>
+
+<script type="text/javascript">
+
+var match_data = [];
+var team_data = [];
+var country_codes = {
+    "France": "FRA",
+    "USA": "USA",
+    "Russia": "RUS",
+    "Brazil": "BRA",
+    "Poland": "POL",
+    "Serbia": "SRB",
+    "Italy": "ITA",
+    "Canada": "CAN",
+    "Japan": "JPN",
+    "Germany": "GER",
+    "Australia": "AUS",
+    "Bulgaria": "BUL",
+    "Iran": "IRI",
+    "Argentina": "ARG",
+    "China": "CHN",
+    "Korea": "KOR"
+}
+
+var flag_codes = {
+    "FRA": "fr",
+    "USA": "us",
+    "RUS": "ru",
+    "BRA": "br",
+    "POL": "pl",
+    "SRB": "rs",
+    "ITA": "it",
+    "CAN": "ca",
+    "JPN": "jp",
+    "GER": "de",
+    "AUS": "au",
+    "BUL": "bg",
+    "IRI": "ir",
+    "ARG": "ar",
+    "CHN": "cn",
+    "KOR": "kr"
+}
+
+
+console.log("importing data...");
+// match data format: 'date', 'win_country', 'loss_country', 'win_score', 'loss_score', 'win_player', 'win_kills', 'loss_player', 'loss_kills'
+d3.csv("match_data.csv", function(data) {
+    // header = d3.keys(data[0]);
+    data.forEach(function(d) {
+        d["win_score"] = +d["win_score"];
+        d["loss_score"] = +d["loss_score"];
+        d["win_kills"] = +d["win_kills"];
+        d["loss_kills"] = +d["loss_kills"];
+    });
+    match_data = data;
+});
+
+// team data format: 'country', 'rank', 'wins', 'losses'
+d3.csv("team_data.csv", function(data) {
+    // header = d3.keys(data[0]);
+    data.forEach(function(d) {
+        d["rank"] = +d["rank"];
+        d["wins"] = +d["wins"];
+        d["losses"] = +d["losses"];
+    });
+    team_data = data;
+    go();
+});
+
+function go() {
+    console.log("go...");
+    var title = d3.select("#page-title")
+        .append("div")
+        .attr("class", "container-fluid")
+        .append("h1")
+        .text("VNL Preliminary Round")
+        .attr("class", "text-center");
+
+    var picker = d3.select('#picker')
+        .append("div")
+        .attr("class", "container-fluid")
+        .append("div")
+        .attr("class", "row align-items-start justify-content-start");
+
+    picker.append("div")
+        .attr("class", "col-4 align-self-center")
+        .append("h3")
+        .text("Country: ")
+        .attr("class", "country_label");
+
+    var select = picker.append("div")
+        .attr("class", "col-4 align-self-center")
+        .append("select")
+        .attr("class", "select")
+        .on("change", onchange);
+
+    var countries = [];
+    team_data.forEach(function(d) {
+        countries.push(d["country"]);
+    })
+    countries.sort();
+    var selectedCountry = countries[0];
+    showGraph(selectedCountry);
+
+    var options = select.selectAll("options")
+        .data(countries)
+        .enter()
+        .append("option")
+        .text(function(d) { return d;   });
+
+    function onchange() {
+        var selectValue = d3.select("select").property("value");
+        console.log(selectValue);
+        selectedCountry = selectValue;
+        d3.select("#chart-title").selectAll("div").remove();
+        d3.select("#chart").selectAll("div").remove();
+        d3.select("#chart-detail").selectAll("div").remove();
+        showGraph(selectedCountry);
+    }
+
+    function showGraph(selectedCountry) {
+        var margin = {top: 10, bottom: 20, left: window.innerWidth*0.05, right: window.innerWidth*0.05};
+        var selectedCountryCode = country_codes[selectedCountry];
+        var width = window.innerWidth * 0.85;
+        var height = 30;
+        var country_row = d3.select("#chart-title")
+            .append("div")
+            .attr("class", "container-fluid")
+            .append("div")
+            .attr("class", "row justify-content-start");
+
+        country_row.append("div")
+            .attr("class", "row")
+            .append("svg")
+            .attr("class", function() {
+                return "flag-icon-background flag-icon-" + flag_codes[selectedCountryCode];
+            });
+
+        country_row.append("div")
+            .attr("class", "row")
+            .append("h3")
+            .text(selectedCountry);
+
+        var record = [];
+        var match_count = 0;
+        for (var i = 0; i < 120; i++) {
+            var currMatch = match_data[i];
+            console.log(selectedCountryCode);
+            if (currMatch.win_country == selectedCountryCode) {
+                record.push("W " + currMatch.loss_country);
+                match_count ++;
+            } else if (currMatch.loss_country == selectedCountryCode) {
+                record.push("L " + currMatch.win_country);
+                match_count ++;
+            }
+        }
+
+        width = window.innerWidth * 0.8;
+        height = window.innerHeight * 0.5;
+        var boxWidth = width * 0.9;
+        var boxHeight = height * 0.3;
+        var gridWidth = boxWidth/match_count;
+        var replacementClass = "";
+        addGraph(selectedCountryCode, "one");
+
+        function addGraph(selectedCode, layer) {
+            var svg = d3.select("#chart")
+                .append("div")
+                .attr("class", "container-fluid")
+                .append("div")
+                .attr("class", "row justify-content-center")
+                .append("div")
+                .attr("class", "btn-group-lg")
+                .attr("id", layer)
+                .attr("role", "group")
+                .attr("data-toggle", "buttons");
+
+            var g = svg.selectAll("div")
+                .data(match_data.filter(function (d) {
+                    return d["win_country"] == selectedCode || d["loss_country"] == selectedCode;
+                }))
+                .enter()
+                .append("button")
+                .attr("class", "btn btn-secondary")
+                .html(function(d) {
+                    if (d["win_country"] == selectedCode) {
+                        return "W vs.<br>" + d["loss_country"];
+                    } else {
+                        return "L vs.<br>" + d["win_country"];
+                    }
+                });
+        }
+
+        var selectCountryCode2 = "";
+        var high_score_stats = [];
+        var low_score_stats = [];
+        d3.select("#one")
+            .on('click', function(d) {
+                // d3.selectAll("svg g rect")
+                //     .filter(function() {
+                //         return d3.select(this).attr("class") == "rect selected"; })
+                //     .attr("class", replacementClass);
+                // var rect_class = d3.select(this).attr("class");
+                // replacementClass = rect_class;
+                // if (rect_class.includes("rect win")) {
+                //     selectCountryCode2 = d["loss_country"];
+                // } else {
+                //     selectCountryCode2 = d["win_country"];
+                // }
+                // console.log(selectCountryCode2);
+                // console.log(d);
+                if (d["win_kills"] >= d["loss_kills"]) {
+                    high_score_stats = [d["win_country"], d["win_player"], d["win_kills"]];
+                    low_score_stats = [d["loss_country"], d["loss_player"], d["loss_kills"]];
+                } else {
+                    low_score_stats = [d["win_country"], d["win_player"], d["win_kills"]];
+                    high_score_stats = [d["loss_country"], d["loss_player"], d["loss_kills"]];
+                }
+
+                // console.log(replacementClass);
+                // d3.select(this).attr("class", "rect selected");
+                // d3.select("#chart").selectAll("div.svg-container-two").remove();
+                addGraph(selectCountryCode2, "two");
+                // addDetail(high_score_stats, low_score_stats);
+            });
+    }
+
+    function addDetail(high_score_stats, low_score_stats) {
+        d3.select("#chart-detail").selectAll("div").remove();
+
+        // d3.select("#chart-detail")
+        //     .append("div")
+        //     .classed("svg-container-flag", true)
+        //     .append("svg")
+        //     .attr("class", function(){
+        //         return "flag-icon flag-icon-" + flag_codes[high_score_stats[0]];
+        //     });
+
+        var svg = d3.select("#chart-detail")
+            .append("div")
+            .classed("svg-container-detail", true)
+            .append("svg")
+            .attr("preserveAspectRatio", "xMinYMin meet")
+            .attr("viewBox", "0 0 " + 250 + " " + 75);
+            // .attr("width", "75%")
+            // .classed("svg-content-responsive", true);
+        svg.append("text")
+            .attr("preserveAspectRatio", "xMinYMin meet")
+            .attr("viewBox", "0 0 " + 250 + " " + 75)
+            .attr("class", "svg-container-flag");
+        // svg.append("svg")
+        //     .attr("width", 20)
+        //     .attr("height", 20)
+        //     .attr("class", function(){
+        //         return "flag-icon flag-icon-" + flag_codes[high_score_stats[0]];
+        //     });
+        // svg.append("div")
+        //     .classed("svg-container-flag", true)
+        //     .append("svg")
+        //     .attr("class", function(){
+        //         return "flag-icon flag-icon-" + flag_codes[high_score_stats[0]];
+        //     });
+        svg.append("rect")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .attr("class", "detail_rect");
+        svg.append("text")
+            .text("Best Scorers:")
+            .attr("class", "detail_text")
+            .attr("x", "10")
+            .attr("y", "5");
+        // svg.append("g")
+        //     .attr("width", "100")
+        //     .attr("height", "100")
+        //     .attr("x", 10)
+        //     .attr("y", 25)
+        //     .append("span")
+        //     .attr("width", "100")
+        //     .attr("height", "100")
+        //     .attr("x", 10)
+        //     .attr("y", 25)
+        //     // .append("span")
+        //     .attr("class", function(){
+        //         return "flag-icon flag-icon-" + flag_codes[high_score_stats[0]];
+        //     });
+            // .text("TEST");
+            // .style("display", "inline-block");
+        svg.append("text")
+            .text(high_score_stats[0] + ": " + high_score_stats[2] + " - " + high_score_stats[1])
+            .attr("class", "detail_text")
+            .attr("x", "25")
+            .attr("y", "25");
+        svg.append("text")
+            .text(low_score_stats[0] + ": " + low_score_stats[2] + " - " + low_score_stats[1])
+            .attr("class", "detail_text")
+            .attr("x", "25")
+            .attr("y", "45");
+    }
+
+}
+
+</script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+</body>
+</html>
