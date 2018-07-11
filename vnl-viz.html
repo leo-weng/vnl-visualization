@@ -1,131 +1,29 @@
 <!DOCTYPE html>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="/lib/d3/d3.v3.min.js"></script>
-<link href="https://fonts.googleapis.com/css?family=Titillium+Web" rel="stylesheet">
-<style>
-:root {
-    --loss3: #ff0000;
-    --loss2: #ff5b5b;
-    --loss1: #ffaaaa;
-    --win3: #0050ff;
-    --win2: #4f86ff;
-    --win1: #89aeff;
-    --font-body: 'Titillium Web', sans-serif;
-}
-rect.win3 {fill: var(--win3);}
-rect.win2 {fill: var(--win2);}
-rect.win1 {fill: var(--win1);}
-rect.loss3 {fill: var(--loss3);}
-rect.loss2 {fill: var(--loss2);}
-rect.loss1 {fill: var(--loss1);}
-rect.selected {fill: yellow;}
-rect.detail_rect {
-    fill: none;
-    stroke: black;
-    stroke-width: 3;
-}
-body {
-    background-color: #c5d2db;
-}
-text.title {
-    display: inline-block;
-    font-family: var(--font-body);
-    /* padding-left: 20%;
-    padding-right: 20%; */
-    padding-top: 20px;
-    padding-bottom: 20px;
-    text-anchor: middle;
-    font-size: 8vw;
-    alignment-baseline: hanging;
-}
-text.country_label {
-    display: inline-block;
-    font-family: var(--font-body);
-    font-size: 4vw;
-    margin-left: 5%;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-top: 10px;
-}
-text.country_text {
-    display: inline-block;
-    font-family: var(--font-body);
-    font-size: 4vw;
-    alignment-baseline: hanging;
-}
-text.box_text {
-    font-size: 2vw;
-    font-family: var(--font-body);
-    fill: black;
-    text-anchor: left;
-    display: inline-block;
-}
-text.detail_text {
-    font-size: 2.2vw;
-    font-family: var(--font-body);
-    fill: black;
-    alignment-baseline: hanging;
-}
-.svg-container-flag  {
-    padding-left: 10px;
-    margin-left: 5%;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    display: inline-block;
-}
-.svg-container-country  {
-    padding-left: 15px;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    display: inline-block;
-    alignment-baseline: hanging;
-}
-.svg-container-one {
-    padding-bottom: 20px;
-}
-.svg-content-responsive {
-    display: inline-block;
-}
-#chart-title {
-    width: 40%;
-    float: left;
-}
-#chart-detail {
-    width: 60%;
-    float: left;
-}
-@media screen and (max-width: 600px) {
-  #chart-title, #chart-detail {
-      width: 100%;
-  }
-}
-/* @media screen and (min-width: 1000px) {
-  text.title { font-size: 5vw; }
-  text.country_label { font-size: 3vw; }
-  text.country_text { font-size: 3.4vw; }
-  #picker {
-      width: 20%;
-      float: left;
-      padding-top: 10px;
-  }
-  #chart-title {
-      width: 35%;
-      float: left;
-  }
-  #chart-detail {
-      width: 40%;
-      float: left;
-  }
-} */
-</style>
-<link href="./node_modules/flag-icon-css/css/flag-icon.css" rel="stylesheet">
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+    <!-- stylesheets -->
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous"> -->
+    <link rel="stylesheet" href="./lib/bootstrap-4.1.1-dist/css/bootstrap.css">
+    <link href="https://fonts.googleapis.com/css?family=Titillium+Web" rel="stylesheet">
+    <link href="stylesheet.css" rel="stylesheet">
+    <link href="./lib/node_modules/flag-icon-css/css/flag-icon.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+</head>
+
 <body>
 <div id = "page-title"></div>
 <div id = "picker"></div>
-<div id = "chart-title"></div>
-<div id = "chart-detail"></div>
+<div id = "chart-header"></div>
 <div id = "chart"></div>
+
+<!-- javascript libraries -->
+<script src="/lib/d3/d3.v3.min.js"></script>
+
 <script type="text/javascript">
+
 var match_data = [];
 var team_data = [];
 var country_codes = {
@@ -146,6 +44,7 @@ var country_codes = {
     "China": "CHN",
     "Korea": "KOR"
 }
+
 var flag_codes = {
     "FRA": "fr",
     "USA": "us",
@@ -164,6 +63,7 @@ var flag_codes = {
     "CHN": "cn",
     "KOR": "kr"
 }
+
 console.log("importing data...");
 // match data format: 'date', 'win_country', 'loss_country', 'win_score', 'loss_score', 'win_player', 'win_kills', 'loss_player', 'loss_kills'
 d3.csv("match_data.csv", function(data) {
@@ -176,6 +76,7 @@ d3.csv("match_data.csv", function(data) {
     });
     match_data = data;
 });
+
 // team data format: 'country', 'rank', 'wins', 'losses'
 d3.csv("team_data.csv", function(data) {
     // header = d3.keys(data[0]);
@@ -187,20 +88,46 @@ d3.csv("team_data.csv", function(data) {
     team_data = data;
     go();
 });
+
 function go() {
     console.log("go...");
     var title = d3.select("#page-title")
         .append("div")
-        .classed("svg-container-title", true)
-        .append("svg")
-        .attr("preserveAspectRatio", "xMinYMin meet")
-        .attr("viewBox", "0 0 " + window.innerWidth + " " + 75)
-        .classed("svg-content-responsive", true);
-    title.append("text")
-        .text("VNL Preliminary Round")
-        .attr("x", window.innerWidth/2)
-        .attr("y", 0)
-        .attr("class", "title");
+        .attr("class", "container-fluid")
+        .append("div")
+        .attr("class", "row justify-content-center")
+        .append("h1")
+        .text("VNL Preliminary Round ")
+        .attr("class", "col-sm-12 col-md-8 col-lg-6")
+        .append("i")
+        .attr("class","fas fa-info-circle")
+        .attr("id", "info")
+        .attr("data-toggle", "tooltip")
+        .attr("data-html", "true")
+        .attr("title", "Simple visualization on the results of the preliminary round of VNL 2018.<br>Color intensity determined by the amount of sets won/lost against opponent.<br>Click on a match to view the opponent's record and match details.");
+
+    $(document).ready(function(){
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+
+    var picker = d3.select('#picker')
+        .append("div")
+        .attr("class", "container-fluid")
+        .append("div")
+        .attr("class", "row align-items-start justify-content-start")
+        .style("margin-bottom", "30px");
+
+    picker.append("h3")
+        .attr("class", "col-4 col-sm-3 col-md-3 col-lg-3 align-self-start")
+        .text("Country: ")
+        .style("text-align", "right");
+
+    var select = picker.append("div")
+        .attr("class", "col-4 col-sm-1.5 col-md-1.5 col-lg-1.5 align-self-start")
+        .append("select")
+        .attr("class", "select")
+        .on("change", onchange);
+
     var countries = [];
     team_data.forEach(function(d) {
         countries.push(d["country"]);
@@ -208,61 +135,50 @@ function go() {
     countries.sort();
     var selectedCountry = countries[0];
     showGraph(selectedCountry);
-    d3.select("#picker")
-        .append("text")
-        .text("Country: ")
-        .attr("class", "country_label");
-    var select = d3.select("#picker")
-        .append("select")
-        .attr("class", "select")
-        .on("change", onchange);
-    var options = select.selectAll("options")
+
+    var options = select.selectAll("#options")
         .data(countries)
         .enter()
         .append("option")
         .text(function(d) { return d;   });
+
     function onchange() {
         var selectValue = d3.select("select").property("value");
-        console.log(selectValue);
+        // console.log(selectValue);
         selectedCountry = selectValue;
-        d3.select("#chart-title").selectAll("div").remove();
+        d3.select("#chart-header").selectAll("div").remove();
         d3.select("#chart").selectAll("div").remove();
-        d3.select("#chart-detail").selectAll("div").remove();
+        // d3.select("#chart-detail").selectAll("div").remove();
         showGraph(selectedCountry);
     }
+
     function showGraph(selectedCountry) {
-        var margin = {top: 10, bottom: 20, left: window.innerWidth*0.05, right: window.innerWidth*0.05};
         var selectedCountryCode = country_codes[selectedCountry];
-        var width = window.innerWidth * 0.85;
-        var height = 30;
-        d3.select("#chart-title")
+        var country_section = d3.select("#chart-header")
             .append("div")
-            .classed("svg-container-flag", true)
-            .append("svg")
-            .attr("width", window.innerWidth*0.10)
-            .attr("height", window.innerWidth*0.10*3/4)
-            // .append("span")
+            .attr("class", "container-fluid")
+            .append("div")
+            .attr("class", "row justify-content-start")
+            .style("margin-bottom", "40px")
+            .attr("id", "country-header-row");
+
+        country_section.append("svg")
+            .style("float", "right")
+            .attr("height", 100)
+            .attr("width", 100*4/3)
             .attr("class", function() {
-                return "flag-icon-background flag-icon-" + flag_codes[selectedCountryCode];
+                return "col-6 col-sm-2 col-md-2 col-lg-2 offset-sm-1 align-self-end flag-icon-background flag-icon-" + flag_codes[selectedCountryCode];
             });
-        d3.select("#chart-title")
-            .append("div")
-            .classed("svg-container-country", true)
-            .append("svg")
-            .attr("width", window.innerWidth*0.20)
-            .attr("height", window.innerWidth*0.10*3/4)
-            .attr("class", "svg_country")
-            .append("text")
-            .text(selectedCountry)
-            .attr("x", 0)
-            .attr("y", 0)
-            .attr("dy", "0.25em")
-            .attr("class", "country_text");
+
+        country_section.append("h3")
+            .attr("class", "col-6 col-sm-3 col-md-3 col-lg-3 align-self-center")
+            .text(selectedCountry);
+
         var record = [];
         var match_count = 0;
         for (var i = 0; i < 120; i++) {
             var currMatch = match_data[i];
-            console.log(selectedCountryCode);
+            // console.log(selectedCountryCode);
             if (currMatch.win_country == selectedCountryCode) {
                 record.push("W " + currMatch.loss_country);
                 match_count ++;
@@ -271,53 +187,49 @@ function go() {
                 match_count ++;
             }
         }
-        width = window.innerWidth * 0.8;
-        height = window.innerHeight * 0.5;
-        var boxWidth = width * 0.9;
-        var boxHeight = height * 0.3;
-        var gridWidth = boxWidth/match_count;
+
         var replacementClass = "";
+        var container = d3.select("#chart")
+            .append("div")
+            .attr("class", "container-fluid");
         addGraph(selectedCountryCode, "one");
+
         function addGraph(selectedCode, layer) {
-            var svg = d3.select("#chart")
+            var button_group = container.append("div")
+                .attr("class", "row justify-content-center")
+                .style("margin-bottom", "20px")
+                .attr("id", "button-row-" + layer)
                 .append("div")
-                .classed("svg-container-" + layer, true)
-                .append("svg")
-                .attr("preserveAspectRatio", "xMinYMin meet")
-                .attr("viewBox", "0 0 " + width + " " + boxHeight)
-                .classed("svg-content-responsive", true);
-            var g = svg.selectAll("g")
-                .data(match_data)
-                .enter()
-                .append("g")
-                .filter(function (d) {
+                .attr("class", "col-lg-10 align-self-center ")
+                .append("div")
+                .attr("class", "btn-group btn-group-toggle")
+                .attr("id", layer)
+                .attr("role", "group")
+                .attr("data-toggle", "buttons");
+
+            var one_button = button_group.selectAll("div")
+                .data(match_data.filter(function (d) {
                     return d["win_country"] == selectedCode || d["loss_country"] == selectedCode;
-                });
-            g.append("rect")
-                .attr("x", function (d, i) {
-                    return margin.left + i * (gridWidth);
-                })
-                .attr("y", function (d) {
-                    return margin.top;
-                })
-                .attr("width", gridWidth - 5)
-                .attr("height", gridWidth)
+                }))
+                .enter()
+                .append("button")
+                // .append("type", "radio")
                 .attr("class", function(d) {
                     if (d["win_country"] == selectedCode) {
                         if (d["win_score"] - d["loss_score"] == 3) {
-                            return "rect win3";
+                            return "btn btn-sm win3";
                         } else if (d["win_score"] - d["loss_score"] == 2) {
-                            return "rect win2";
+                            return "btn btn-sm win2";
                         } else if (d["win_score"] - d["loss_score"] == 1) {
-                            return "rect win1";
+                            return "btn btn-sm win1";
                         }
                     } else {
                         if (d["win_score"] - d["loss_score"] == 3) {
-                            return "rect loss3";
+                            return "btn btn-sm loss3";
                         } else if (d["win_score"] - d["loss_score"] == 2) {
-                            return "rect loss2";
+                            return "btn btn-sm loss2";
                         } else if (d["win_score"] - d["loss_score"] == 1) {
-                            return "rect loss1";
+                            return "btn btn-sm loss1";
                         }
                     }
                 })
@@ -328,17 +240,7 @@ function go() {
                         return "L " + d["win_country"];
                     }
                 });
-            var text_min = 10000;
-            g.append("text")
-                .attr("x", function(d, i) {
-                    return margin.left + i * (gridWidth) + gridWidth*0.1;
-                })
-                .attr("y", function(d) {
-                    return margin.top;
-                })
-                .attr("dy", "0.5em")
-                .attr("class", "box_text")
-                .attr("alignment-baseline", "hanging")
+            one_button.append("h5")
                 .text(function(d) {
                     if (d["win_country"] == selectedCode) {
                         return "W";
@@ -346,58 +248,31 @@ function go() {
                         return "L";
                     }
                 });
-            g.append("text")
-                .attr("x", function(d, i) {
-                    return margin.left + i * (gridWidth) + gridWidth*0.1;
-                })
-                .attr("y", function(d) {
-                    return margin.top;
-                })
-                .attr("dy", "1.5em")
-                .attr("class", "box_text")
-                .attr("alignment-baseline", "hanging")
+            one_button.append("h6")
                 .text(function(d) {
                     if (d["win_country"] == selectedCode) {
                         return d["loss_country"];
                     } else {
                         return d["win_country"];
                     }
-                })
-                .each(function(d) {
-                    text_min = Math.min(text_min, (gridWidth-8) / this.getComputedTextLength() * 10)
-                });
-            // console.log("text_min: " + text_min);
-            d3.selectAll("svg g text")
-                .style("font-size", function(d) {
-                    return text_min + "px";
                 });
         }
-        // Object.prototype.getKeyByValue = function( value ) {
-        //     for( var prop in this ) {
-        //         if( this.hasOwnProperty( prop ) ) {
-        //              if( this[ prop ] === value )
-        //                  return prop;
-        //         }
-        //     }
-        // }
         var selectCountryCode2 = "";
         var high_score_stats = [];
         var low_score_stats = [];
-        d3.selectAll("svg g rect")
-            .on('click', function(d) {
-                d3.selectAll("svg g rect")
+        d3.selectAll("button")
+            .on("click", function(d) {
+                d3.selectAll("button")
                     .filter(function() {
-                        return d3.select(this).attr("class") == "rect selected"; })
+                        return d3.select(this).attr("class").includes("selected"); })
                     .attr("class", replacementClass);
                 var rect_class = d3.select(this).attr("class");
                 replacementClass = rect_class;
-                if (rect_class.includes("rect win")) {
+                if (rect_class.includes("win")) {
                     selectCountryCode2 = d["loss_country"];
                 } else {
                     selectCountryCode2 = d["win_country"];
                 }
-                // console.log(selectCountryCode2);
-                // console.log(d);
                 if (d["win_kills"] >= d["loss_kills"]) {
                     high_score_stats = [d["win_country"], d["win_player"], d["win_kills"]];
                     low_score_stats = [d["loss_country"], d["loss_player"], d["loss_kills"]];
@@ -405,85 +280,61 @@ function go() {
                     low_score_stats = [d["win_country"], d["win_player"], d["win_kills"]];
                     high_score_stats = [d["loss_country"], d["loss_player"], d["loss_kills"]];
                 }
-                console.log(replacementClass);
-                d3.select(this).attr("class", "rect selected");
-                d3.select("#chart").selectAll("div.svg-container-two").remove();
+
+                d3.select(this).attr("class", rect_class + " selected");
+                d3.selectAll("#button-row-two").remove();
                 addGraph(selectCountryCode2, "two");
                 addDetail(high_score_stats, low_score_stats);
             });
     }
     function addDetail(high_score_stats, low_score_stats) {
-        d3.select("#chart-detail").selectAll("div").remove();
-        // d3.select("#chart-detail")
-        //     .append("div")
-        //     .classed("svg-container-flag", true)
-        //     .append("svg")
-        //     .attr("class", function(){
-        //         return "flag-icon flag-icon-" + flag_codes[high_score_stats[0]];
-        //     });
-        var svg = d3.select("#chart-detail")
+        d3.select("#chart-header").selectAll("#chart-detail").remove();
+        var details = d3.select("#country-header-row")
             .append("div")
-            .classed("svg-container-detail", true)
+            .attr("class", "col-12 col-sm-6")
+            .attr("id", "chart-detail");
+        details.append("h4")
+            .text("Best Scorers: ");
+        var row1 = details.append("div")
+            .attr("class", "row");
+        row1.append("div")
+            .attr("class", "col-2 col-sm-2 col-md-1 col-lg-1")
             .append("svg")
-            .attr("preserveAspectRatio", "xMinYMin meet")
-            .attr("viewBox", "0 0 " + 250 + " " + 75);
-            // .attr("width", "75%")
-            // .classed("svg-content-responsive", true);
-        svg.append("text")
-            .attr("preserveAspectRatio", "xMinYMin meet")
-            .attr("viewBox", "0 0 " + 250 + " " + 75)
-            .attr("class", "svg-container-flag");
-        // svg.append("svg")
-        //     .attr("width", 20)
-        //     .attr("height", 20)
-        //     .attr("class", function(){
-        //         return "flag-icon flag-icon-" + flag_codes[high_score_stats[0]];
-        //     });
-        // svg.append("div")
-        //     .classed("svg-container-flag", true)
-        //     .append("svg")
-        //     .attr("class", function(){
-        //         return "flag-icon flag-icon-" + flag_codes[high_score_stats[0]];
-        //     });
-        svg.append("rect")
-            .attr("x", 0)
-            .attr("y", 0)
-            .attr("width", "100%")
-            .attr("height", "100%")
-            .attr("class", "detail_rect");
-        svg.append("text")
-            .text("Best Scorers:")
-            .attr("class", "detail_text")
-            .attr("x", "10")
-            .attr("y", "5");
-        // svg.append("g")
-        //     .attr("width", "100")
-        //     .attr("height", "100")
-        //     .attr("x", 10)
-        //     .attr("y", 25)
-        //     .append("span")
-        //     .attr("width", "100")
-        //     .attr("height", "100")
-        //     .attr("x", 10)
-        //     .attr("y", 25)
-        //     // .append("span")
-        //     .attr("class", function(){
-        //         return "flag-icon flag-icon-" + flag_codes[high_score_stats[0]];
-        //     });
-            // .text("TEST");
-            // .style("display", "inline-block");
-        svg.append("text")
-            .text(high_score_stats[0] + ": " + high_score_stats[2] + " - " + high_score_stats[1])
-            .attr("class", "detail_text")
-            .attr("x", "25")
-            .attr("y", "25");
-        svg.append("text")
-            .text(low_score_stats[0] + ": " + low_score_stats[2] + " - " + low_score_stats[1])
-            .attr("class", "detail_text")
-            .attr("x", "25")
-            .attr("y", "45");
+            .style("float", "left")
+            .attr("width", 25*4/3)
+            .attr("height", 25)
+            .attr("class", function() {
+                return "flag-icon-background flag-icon-" + flag_codes[high_score_stats[0]];
+            });
+        row1.append("div")
+            .attr("class", "col-10 col-sm-10 col-md-11 col-lg-11")
+            .append("h4")
+            .text(high_score_stats[2] + " - " + high_score_stats[1]);
+
+        var row2 = details.append("div")
+            .attr("class", "row");
+        row2.append("div")
+            .attr("class", "col-2 col-sm-2 col-md-1 col-lg-1")
+            .append("svg")
+            .style("float", "left")
+            .attr("width", 25*4/3)
+            .attr("height", 25)
+            .attr("class", function() {
+                return "flag-icon-background flag-icon-" + flag_codes[low_score_stats[0]];
+            });
+        row2.append("div")
+            .attr("class", "col-10 col-sm-10 col-md-11 col-lg-11")
+            .append("h4")
+            .text(low_score_stats[2] + " - " + low_score_stats[1]);
     }
+
 }
+
+
+
 </script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
 </body>
 </html>

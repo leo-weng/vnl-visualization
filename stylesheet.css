@@ -7,125 +7,63 @@
     --win1: #89aeff;
     --font-body: 'Titillium Web', sans-serif;
 }
-
-rect.win3 {fill: var(--win3);}
-rect.win2 {fill: var(--win2);}
-rect.win1 {fill: var(--win1);}
-rect.loss3 {fill: var(--loss3);}
-rect.loss2 {fill: var(--loss2);}
-rect.loss1 {fill: var(--loss1);}
-rect.selected {fill: yellow;}
-rect.detail_rect {
-    fill: none;
-    stroke: black;
-    stroke-width: 3;
-}
+button.win3 {background-color: var(--win3); color: black;}
+button.win2 {background-color: var(--win2); color: black;}
+button.win1 {background-color: var(--win1); color: black;}
+button.loss3 {background-color: var(--loss3); color: black;}
+button.loss2 {background-color: var(--loss2); color: black;}
+button.loss1 {background-color: var(--loss1); color: black;}
+button.selected {background-color: yellow !important;}
 
 body {
     background-color: #c5d2db;
-}
-
-text.title {
-    display: inline-block;
     font-family: var(--font-body);
-    /* padding-left: 20%;
-    padding-right: 20%; */
-    /* padding-top: 20px;
-    padding-bottom: 20px;
-    text-anchor: middle;
-    font-size: 8vw;
-    alignment-baseline: hanging; */
+}
+.select {
+    background-color: #c5d2db;
+    border-color: black;
+    color: black;
+    font-size: 14px;
 }
 
-text.country_label {
-    display: inline-block;
-    font-family: var(--font-body);
-    /* font-size: 4vw; */
-    /* margin-left: 5%;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-top: 10px; */
+button { width: 06vw;}
+h1 { font-size: 30px; text-align: center; padding-top: 20px; }
+h3 { font-size: 20px;}
+h4 { font-size: 18px;}
+h5 { font-size: 10px; margin-left: -5px;}
+h6 { font-size: 8px; margin-left: -5px;}
+#chart-detail { padding-top: 20px; padding-left: 50px; }
+.tooltip-inner { min-width: 300px; }
+@media (min-width: 576px) {
+    #country-header-row { padding-top: 20px;}
+    .select { font-size: 20px; }
+    button { width: 06vw;}
+    h3 { font-size: 25px;}
+    h4 { font-size: 20px;}
+    h5 { font-size: 15px;}
+    h6 { font-size: 13px;}
+    #chart-detail { padding-top: 0px; padding-left: 0px; }
 }
-
-text.country_text {
-    display: inline-block;
-    font-family: var(--font-body);
-    /* font-size: 4vw; */
-    /* alignment-baseline: hanging; */
+@media (min-width: 768px) {
+    button { width: 06vw;}
+    h4 { font-size: 22px;}
+    h5 { font-size: 18px; padding-left: 5px;}
+    h6 { font-size: 15px;}
+    .tooltip-inner { min-width: 550px; }
 }
-/* 
-text.box_text {
-    font-size: 2vw;
-    font-family: var(--font-body);
-    fill: black;
-    text-anchor: left;
-    display: inline-block;
+@media (min-width: 992px) {
+    button { width: 06vw;}
+    h1 { font-size: 40px;}
+    .select { font-size: 25px; }
+    h3 { font-size: 30px;}
+    h4 { font-size: 24px;}
+    h5 { font-size: 20px;}
+    h6 { font-size: 18px;}
 }
-
-text.detail_text {
-    font-size: 2.2vw;
-    font-family: var(--font-body);
-    fill: black;
-    alignment-baseline: hanging;
+@media (min-width: 1200px) {
+    button { width: 70px;}
+    h1 { font-size: 50px;}
+    h4 { font-size: 26px;}
+    h5 { font-size: 24px;}
+    h6 { font-size: 20px;}
 }
-
-.svg-container-flag  {
-    padding-left: 10px;
-    margin-left: 5%;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    display: inline-block;
-}
-
-.svg-container-country  {
-    padding-left: 15px;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    display: inline-block;
-    alignment-baseline: hanging;
-}
-
-.svg-container-one {
-    padding-bottom: 20px;
-}
-.svg-content-responsive {
-    display: inline-block;
-}
-
-#chart-title {
-    width: 40%;
-    float: left;
-}
-#chart-detail {
-    width: 60%;
-    float: left;
-} */
-
-@media screen and (max-width: 600px) {
-  #chart-title, #chart-detail {
-      width: 100%;
-  }
-}
-
-/* @media screen and (min-width: 1000px) {
-  text.title { font-size: 5vw; }
-  text.country_label { font-size: 3vw; }
-  text.country_text { font-size: 3.4vw; }
-
-  #picker {
-      width: 20%;
-      float: left;
-      padding-top: 10px;
-  }
-
-  #chart-title {
-      width: 35%;
-      float: left;
-  }
-
-  #chart-detail {
-      width: 40%;
-      float: left;
-  }
-
-} */

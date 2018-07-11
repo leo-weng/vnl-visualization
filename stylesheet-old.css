@@ -1,0 +1,131 @@
+:root {
+    --loss3: #ff0000;
+    --loss2: #ff5b5b;
+    --loss1: #ffaaaa;
+    --win3: #0050ff;
+    --win2: #4f86ff;
+    --win1: #89aeff;
+    --font-body: 'Titillium Web', sans-serif;
+}
+
+rect.win3 {fill: var(--win3);}
+rect.win2 {fill: var(--win2);}
+rect.win1 {fill: var(--win1);}
+rect.loss3 {fill: var(--loss3);}
+rect.loss2 {fill: var(--loss2);}
+rect.loss1 {fill: var(--loss1);}
+rect.selected {fill: yellow;}
+rect.detail_rect {
+    fill: none;
+    stroke: black;
+    stroke-width: 3;
+}
+
+body {
+    background-color: #c5d2db;
+}
+
+text.title {
+    display: inline-block;
+    font-family: var(--font-body);
+    /* padding-left: 20%;
+    padding-right: 20%; */
+    /* padding-top: 20px;
+    padding-bottom: 20px;
+    text-anchor: middle;
+    font-size: 8vw;
+    alignment-baseline: hanging; */
+}
+
+text.country_label {
+    display: inline-block;
+    font-family: var(--font-body);
+    /* font-size: 4vw; */
+    /* margin-left: 5%;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px; */
+}
+
+text.country_text {
+    display: inline-block;
+    font-family: var(--font-body);
+    /* font-size: 4vw; */
+    /* alignment-baseline: hanging; */
+}
+/* 
+text.box_text {
+    font-size: 2vw;
+    font-family: var(--font-body);
+    fill: black;
+    text-anchor: left;
+    display: inline-block;
+}
+
+text.detail_text {
+    font-size: 2.2vw;
+    font-family: var(--font-body);
+    fill: black;
+    alignment-baseline: hanging;
+}
+
+.svg-container-flag  {
+    padding-left: 10px;
+    margin-left: 5%;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    display: inline-block;
+}
+
+.svg-container-country  {
+    padding-left: 15px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    display: inline-block;
+    alignment-baseline: hanging;
+}
+
+.svg-container-one {
+    padding-bottom: 20px;
+}
+.svg-content-responsive {
+    display: inline-block;
+}
+
+#chart-title {
+    width: 40%;
+    float: left;
+}
+#chart-detail {
+    width: 60%;
+    float: left;
+} */
+
+@media screen and (max-width: 600px) {
+  #chart-title, #chart-detail {
+      width: 100%;
+  }
+}
+
+/* @media screen and (min-width: 1000px) {
+  text.title { font-size: 5vw; }
+  text.country_label { font-size: 3vw; }
+  text.country_text { font-size: 3.4vw; }
+
+  #picker {
+      width: 20%;
+      float: left;
+      padding-top: 10px;
+  }
+
+  #chart-title {
+      width: 35%;
+      float: left;
+  }
+
+  #chart-detail {
+      width: 40%;
+      float: left;
+  }
+
+} */
